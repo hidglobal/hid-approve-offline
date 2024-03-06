@@ -72,8 +72,9 @@ app.post('/register', (req, res) => {
               .then((response) => {
                 if (response.ok) {
                   response.json().then((data) => {
-                    console.log(`Provisioning code: ${data.attributes[0].value}`);
                     let payload = data.attributes[0].value;
+                    let code = [...payload.match(/secret=(.*)&issuer/)];
+                    console.log(`Provisioning response: ${payload}`);
                     let deepLink = `https://approve.app.link/activate?name=HID%20Example%20Auth&qrcode=${Buffer.from(payload).toString('base64')}`;
                     res.status(200).send(`
                       <html>
@@ -82,6 +83,8 @@ app.post('/register', (req, res) => {
                           <h2>Activation Link</h2>
                           <p>Click the link below to activate HID Approve on your device:</p>
                           <a href="${deepLink}">${deepLink}</a>
+                          <br />
+                          <p class="description">Or manually enter the following code into the HID Approve app: ${code[1]}</p>
                         </section></div></main></div></body>
                       </html>
                     `);
