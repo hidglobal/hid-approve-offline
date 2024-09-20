@@ -12,7 +12,7 @@ This is an example application that shows the sequence to activate a HID Approve
 
 You will need an OpenID Connect client application created. If you are using the HID Authentication Service, create an application in the HID Admin Portal. If you are using the HID Appliance, create a user with a system login static password and then create an adapter of type OpenID Connect with the same name as the user.
 
-To run this example you can define the following environment variables:
+To run this example you must define the following environment variables:
 
 ```bash
 HID_AUTH_URL=https://{appliance or service address}/idp/{tenant}
@@ -20,3 +20,5 @@ HID_SCIM_URL=https://{appliance or service address}/scim/{tenant}
 HID_CLIENT_ID={oidc client id}
 HID_CLIENT_SECRET={oidc client secret}
 ```
+
+Also note that if your appliance is using a certificate issued by an internal CA, you may need to set the `NODE_EXTRA_CA_CERTS` environment variable to point to the CA certificate file.
