@@ -30,7 +30,7 @@ app.post('/register', (req, res) => {
           res.status(500).send('Server is not configured correctly');
           return;
         }
-          // 2. Find the user
+        // 2. Find the user
         fetch(`${process.env.HID_SCIM_URL}/Users/.search`, {
           method: 'POST',
           headers: {
@@ -56,7 +56,7 @@ app.post('/register', (req, res) => {
                 attributes: [
                   {
                     name: "AUTH_TYPE",
-                    value: "AT_CUSTOTP",
+                    value: "AT_EMPOTP",
                     readOnly: false
                   }
                 ]
@@ -75,15 +75,16 @@ app.post('/register', (req, res) => {
                     let payload = data.attributes[0].value;
                     let code = [...payload.match(/secret=(.*)&issuer/)];
                     console.log(`Provisioning response: ${payload}`);
-                    let deepLink = `https://approve.app.link/activate?name=HID%20Example%20Auth&qrcode=${Buffer.from(payload).toString('base64')}`;
+                    let deepLink = `https://approve.app.link/activate?name=HID%20Approve%20OTP&qrcode=${Buffer.from(payload).toString('base64')}`;
                     res.status(200).send(`
                       <html>
                         <header><title>Activation Link</title><link rel="stylesheet" type="text/css" href="/css/styles.css"></header>
                         <body><div class="page page--full-width"><main class="page__content"><div class="region region--content"><section class="section section--layout-onecol">
                           <h2>Activation Link</h2>
                           <p>Click the link below to activate HID Approve on your device:</p>
-                          <a href="${deepLink}">${deepLink}</a>
-                          <br />
+                          <div>
+                          <a href="${deepLink}"><button class="button button-primary">Activate</button></a>
+                          </div>
                           <p class="description">Or manually enter the following code into the HID Approve app: ${code[1]}</p>
                         </section></div></main></div></body>
                       </html>
@@ -95,6 +96,8 @@ app.post('/register', (req, res) => {
           }
         })
       });
+    } else {
+      console.log('Error:', response.statusText);
     }
   })
   .catch((error) => {
