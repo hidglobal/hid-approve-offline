@@ -81,11 +81,11 @@ app.post('/register', (req, res) => {
                         <header><title>Activation Link</title><link rel="stylesheet" type="text/css" href="/css/styles.css"></header>
                         <body><div class="page page--full-width"><main class="page__content"><div class="region region--content"><section class="section section--layout-onecol">
                           <h2>Activation Link</h2>
-                          <p>Click the link below to activate HID Approve on your device:</p>
+                          <p>Send the link below to the user so they can register HID Approve</p>
                           <div>
-                          <a href="${deepLink}"><button class="button button-primary">Activate</button></a>
+                          <a href="${deepLink}">${deepLink}</a>
                           </div>
-                          <p class="description">Or manually enter the following code into the HID Approve app: ${code[1]}</p>
+                          <p class="description">Alternatively, you can ask them to install <a href="https://www.hidglobal.com/drivers/41692">HID Approve</a> and manually enter the following code: ${code[1]}</p>
                         </section></div></main></div></body>
                       </html>
                     `);
