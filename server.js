@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const qr = require('qrcode');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -74,21 +75,26 @@ app.post('/register', (req, res) => {
                   response.json().then((data) => {
                     let payload = data.attributes[0].value;
                     let code = [...payload.match(/secret=(.*)&issuer/)];
-                    console.log(`Provisioning response: ${payload}`);
+                    console.log(`Activation code ${code ? 'OK' : 'Error'}`);
                     let deepLink = `https://approve.app.link/activate?name=HID%20Approve%20OTP&qrcode=${Buffer.from(payload).toString('base64')}`;
-                    res.status(200).send(`
-                      <html>
-                        <header><title>Activation Link</title><link rel="stylesheet" type="text/css" href="/css/styles.css"></header>
-                        <body><div class="page page--full-width"><main class="page__content"><div class="region region--content"><section class="section section--layout-onecol">
-                          <h2>Activation Link</h2>
-                          <p>Send the link below to the user so they can register HID Approve</p>
-                          <div>
-                          <a href="${deepLink}">${deepLink}</a>
-                          </div>
-                          <p class="description">Alternatively, you can ask them to install <a href="https://www.hidglobal.com/drivers/41692">HID Approve</a> and manually enter the following code: ${code[1]}</p>
-                        </section></div></main></div></body>
-                      </html>
-                    `);
+                    qr.toDataURL(deepLink, (err, url) => {
+                      res.send(`
+                        <html>
+                          <header><title>Activation Link</title><link rel="stylesheet" type="text/css" href="/css/styles.css"></header>
+                          <body><div class="page page--full-width"><main class="page__content"><div class="region region--content"><section class="section section--layout-onecol">
+                            <h2>Activation Link</h2>
+                            <p>Send the link below to the user so they can register HID Approve</p>
+                            <div>
+                            <a href="${deepLink}">${deepLink}</a>
+                            </div>
+                            <div>
+                            <img src="${url}" alt="QR Code" />
+                            </div>
+                            <p class="description">Alternatively, you can ask them to install <a href="https://www.hidglobal.com/drivers/41692">HID Approve</a> and manually enter the following code: ${code[1]}</p>
+                          </section></div></main></div></body>
+                        </html>
+                      `);
+                    });
                   });
                 }
               })
