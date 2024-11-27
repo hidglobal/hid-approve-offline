@@ -1,9 +1,16 @@
 require('dotenv').config();
 const express = require('express');
+const https = require('https');
+const fs = require('fs');
 const qr = require('qrcode');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 443;
+
+// Load SSL certificates
+const privateKey = fs.readFileSync('server_key.pem', 'utf8');
+const certificate = fs.readFileSync('server_cert.pem', 'utf8');
+const credentials = { key: privateKey, cert: certificate };
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -111,7 +118,9 @@ app.post('/register', (req, res) => {
   });
 });
       
+// Create HTTPS server
+const httpsServer = https.createServer(credentials, app);
 
-app.listen(port, () => {
+httpsServer.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
