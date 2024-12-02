@@ -50,6 +50,22 @@ app.post('/register', (req, res) => {
         .then((response) => {
           if (response.ok) {
             response.json().then((data) => {
+              if (data.totalResults === 0) {
+                console.log(`User ${req.body.username} not found`);
+                res.status(404).send(`
+                  <html>
+                    <header><title>Not Found</title><link rel="stylesheet" type="text/css" href="/css/styles.css"></header>
+                    <body><div class="page page--full-width"><main class="page__content"><div class="region region--content"><section class="section section--layout-onecol">
+                      <h2>Not Found!</h2>
+                      <p>The user <strong>${req.body.username}</strong> was not found!</p>
+                      <div>
+                      <a href="/">Go back</a>
+                      </div>
+                    </section></div></main></div></body>
+                  </html>
+                `);
+                return;
+              }
               console.log(`User: ${data.resources[0].displayName} (${data.resources[0].id})`);
               let userid = data.resources[0].id;
               // 3. Create provisioning request
