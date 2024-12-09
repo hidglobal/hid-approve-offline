@@ -12,7 +12,7 @@ This is an example application that shows the sequence to activate a HID Approve
 
 You will need an OpenID Connect client application created. If you are using the HID Authentication Service, create an application in the HID Admin Portal. If you are using the HID Appliance, create a user with a system login static password and then create an adapter of type OpenID Connect with the same name as the user.
 
-The application is served with TLS, so you will need a certificate and key file. Put them in `server_cert.pem` and `server_key.pem` in the root of the project. By default, the application will try to use port 443 but that requires that you run in with elevated privileges. In Windows open a command prompt as administrator and in Linux use sudo to run `npm run start`.
+The application is served with TLS, so you will need a certificate and key file in PKCS#12 format. Put them in `server_cert.pfx` in the root of the project. By default, the application will try to use port 443 but that requires that you run in with elevated privileges. In Windows open a command prompt as administrator and in Linux use sudo to run `npm run start`.
 
 To run this example you must define the following environment variables:
 
@@ -21,6 +21,13 @@ HID_AUTH_URL=https://{appliance or service address}/idp/{tenant}
 HID_SCIM_URL=https://{appliance or service address}/scim/{tenant}
 HID_CLIENT_ID={oidc client id}
 HID_CLIENT_SECRET={oidc client secret}
+P12_PASSPHRASE={p12 passphrase}
+```
+
+If you prefer to provide cretentials when launching the application, then provide the client_id, client_secret and p12_passphrase as command line arguments, like this:
+
+```
+node server.js {client_id} {client_secret} {p12_passphrase}
 ```
 
 Also note that if your appliance is using a certificate issued by an internal CA, you may need to set the `NODE_EXTRA_CA_CERTS` environment variable to point to the CA certificate file.

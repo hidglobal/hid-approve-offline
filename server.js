@@ -4,13 +4,24 @@ const https = require('https');
 const fs = require('fs');
 const qr = require('qrcode');
 
+const args = process.argv.slice(2);
+let clientId = process.env.HID_CLIENT_ID;
+let clientSecret = process.env.HID_CLIENT_SECRET;
+let pfxPassphrase = process.env.P12_PASSPHRASE;
+
+if (args.length >= 3) {
+  clientId = args[0];
+  clientSecret = args[1];
+  pfxPassphrase = args[2];
+}
+
 const app = express();
 const port = process.env.PORT || 443;
 
-// Load SSL certificates
-const privateKey = fs.readFileSync('server_key.pem', 'utf8');
-const certificate = fs.readFileSync('server_cert.pem', 'utf8');
-const credentials = { key: privateKey, cert: certificate };
+// Load SSL certificate from PFX file
+const pfx = fs.readFileSync('server_cert.pfx');
+const passphrase = pfxPassphrase;
+const credentials = { pfx: pfx, passphrase: passphrase };
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -18,7 +29,7 @@ app.use(express.static('public'));
 
 app.post('/register', (req, res) => {
   console.log(`Registering user: ${req.body.username}`);
-  const authBasic = Buffer.from(`${process.env.HID_CLIENT_ID}:${process.env.HID_CLIENT_SECRET}`, 'utf8').toString('base64');
+  const authBasic = Buffer.from(`${clientId}:${clientSecret}`, 'utf8').toString('base64');
 
   // 1. Get application access token
   fetch(`${process.env.HID_AUTH_URL}/token`, {
