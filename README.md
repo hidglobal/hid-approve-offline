@@ -12,6 +12,8 @@ This is an example application that shows the sequence to activate a HID Approve
 
 You will need an OpenID Connect client application created. If you are using the HID Authentication Service, create an application in the HID Admin Portal. If you are using the HID Appliance, create a user with a system login static password and then create an adapter of type OpenID Connect with the same name as the user.
 
+Users in Active Directory are visible through SCIM in the appliance only when they have an associated authentication record. The application attempts a dummy authentication to create an LDAP passthrough record. For this to work, you need to configure the adapter to use the `CH_SSP` in the field 'Code of the channel thought which an end user of the client authenticates and `AT_LDAP` in the field 'Code of the default authentication policy for the end user'.
+
 The application is served with TLS, so you will need a certificate and key file in PKCS#12 format. Put them in `server_cert.pfx` in the root of the project. By default, the application will try to use port 443 but that requires that you run in with elevated privileges. In Windows open a command prompt as administrator and in Linux use sudo to run `npm run start`.
 
 To run this example you must define the following environment variables:
