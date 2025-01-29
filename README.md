@@ -33,3 +33,11 @@ node server.js {client_id} {client_secret} {p12_passphrase}
 ```
 
 Also note that if your appliance is using a certificate issued by an internal CA, you may need to set the `NODE_EXTRA_CA_CERTS` environment variable to point to the CA certificate file.
+
+## Installation
+
+You need to install [node.js](https://nodejs.org/) and clone this repository in your machine, either downloading the zip file or using git:
+`git clone https://github.com/hidglobal/hid-approve-offline-activation.git`
+
+Then, open a command prompt and navigate to the folder where you cloned the repository and run the following command to install the dependencies:
+`npm install`
