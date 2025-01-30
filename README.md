@@ -34,6 +34,8 @@ node server.js {client_id} {client_secret} {p12_passphrase}
 
 Also note that if your appliance is using a certificate issued by an internal CA, you may need to set the `NODE_EXTRA_CA_CERTS` environment variable to point to the CA certificate file.
 
+It is also possible to start the server without TLS, in case there is no `server_cert.pfx` file in the folder wher the application runs from.
+
 ## Installation
 
 You need to install [node.js](https://nodejs.org/) and clone this repository in your machine, either downloading the zip file or using git:

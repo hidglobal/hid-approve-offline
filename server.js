@@ -9,19 +9,17 @@ let clientId = process.env.HID_CLIENT_ID;
 let clientSecret = process.env.HID_CLIENT_SECRET;
 let pfxPassphrase = process.env.P12_PASSPHRASE;
 
-if (args.length >= 3) {
+if (args.length == 3) {
+  pfxPassphrase = args[2];
+}
+
+if (args.length >= 2) {
   clientId = args[0];
   clientSecret = args[1];
-  pfxPassphrase = args[2];
 }
 
 const app = express();
 const port = process.env.PORT || 443;
-
-// Load SSL certificate from PFX file
-const pfx = fs.readFileSync('server_cert.pfx');
-const passphrase = pfxPassphrase;
-const credentials = { pfx: pfx, passphrase: passphrase };
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -157,9 +155,23 @@ app.post('/register', (req, res) => {
   });
 });
       
-// Create HTTPS server
-const httpsServer = https.createServer(credentials, app);
+// Check if the PFX file exists
+const pfxPath = 'server_cert.pfx';
+if (fs.existsSync(pfxPath)) {
+  // Load SSL certificate from PFX file
+  const pfx = fs.readFileSync(pfxPath);
+  const passphrase = pfxPassphrase;
+  const credentials = { pfx: pfx, passphrase: passphrase };
 
-httpsServer.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+  // Create HTTPS server
+  const httpsServer = https.createServer(credentials, app);
+  httpsServer.listen(port, () => {
+    console.log(`HTTPS Server is running on port ${port}`);
+  });
+} else {
+  // Create HTTP server
+  const httpPort = process.env.HTTP_PORT || 3000;
+  app.listen(httpPort, () => {
+    console.log(`HTTP Server is running on port ${httpPort}`);
+  });
+}
