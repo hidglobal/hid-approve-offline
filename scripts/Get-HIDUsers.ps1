@@ -1,8 +1,8 @@
 param (
-    [string]$authUrl = "https://appliance_fqdn/idp/ENTERPRISE/authn",
-    [string]$scimUrl = "https://appliance_fqdn/scim/ENTERPRISE/v2",
-    [string]$clientId = "xxxx",
-    [string]$clientSecret = "xxxx"
+    [string]$authUrl = "https://app.hiddemo.com/idp/ENTERPRISE/authn",
+    [string]$scimUrl = "https://app.hiddemo.com/scim/ENTERPRISE/v2",
+    [string]$clientId = "hid_approve_setup",
+    [string]$clientSecret = "Approve1234"
 )
 
 function Get-AccessToken {
@@ -19,13 +19,25 @@ function Get-AccessToken {
     return $response.access_token
 }
 
+function Get-AuthenticatorDetails {
+    param (
+        [string]$accessToken,
+        [string]$authenticatorUrl
+    )
+    $response = Invoke-RestMethod -Uri $authenticatorUrl -Method Get -Headers @{
+        Authorization = "Bearer $accessToken"
+        'Content-Type' = 'application/scim+json'
+    }
+    return $response.statistics.lastSuccessfulDate
+}
+
 function Get-Users {
     param (
         [string]$accessToken,
         [string]$scimUrl
     )
     $csvPath = "users.csv"
-    $csvHeader = "id,userName"
+    $csvHeader = "id,userName,lastLogon"
     $csvHeader | Out-File -FilePath $csvPath -Encoding utf8
 
     $userCount = 0
@@ -33,7 +45,7 @@ function Get-Users {
     do {
         Write-Host "Getting users $userCount to $($userCount + 100)" -NoNewline
         $body = @{
-            attributes = @('id', 'externalId', 'urn:hid:scim:api:idp:2.0:UserAttribute')
+            attributes = @('id', 'externalId', 'urn:hid:scim:api:idp:2.0:UserAuthenticator')
             filter = 'groups.value eq USG_FTEMP'
             sortBy = 'id'
             sortOrder = 'ascending'
@@ -50,9 +62,13 @@ function Get-Users {
         $userCount += $response.resources.Count
 
         foreach ($user in $response.resources) {
-            $attributes = $user.'urn:hid:scim:api:idp:2.0:UserAttribute'.attributes
-            $ATR_CMPNY = ($attributes | Where-Object { $_.name -eq 'ATR_CMPNY' }).value
-            "$($user.id),$($user.externalId),$ATR_CMPNY" | Out-File -FilePath $csvPath -Append -Encoding utf8
+            $authenticatorRef = $user.'urn:hid:scim:api:idp:2.0:UserAuthenticator'.authenticators[0].'$ref'
+            $lastLogon = if ($authenticatorRef) {
+                Get-AuthenticatorDetails -accessToken $accessToken -authenticatorUrl $authenticatorRef
+            } else {
+                "N/A"
+            }
+            "$($user.id),$($user.externalId),$lastLogon" | Out-File -FilePath $csvPath -Append -Encoding utf8
         }
         Write-Host "`r" -NoNewline
     } while ($userCount -lt $maxUsers)
