@@ -1,8 +1,8 @@
 param (
-    [string]$authUrl = "https://app.hiddemo.com/idp/ENTERPRISE/authn",
-    [string]$scimUrl = "https://app.hiddemo.com/scim/ENTERPRISE/v2",
-    [string]$clientId = "hid_approve_setup",
-    [string]$clientSecret = "Approve1234"
+    [string]$authUrl = "https://appliance_fqdn/idp/ENTERPRISE/authn",
+    [string]$scimUrl = "https://appliance_fqdn/scim/ENTERPRISE/v2",
+    [string]$clientId = "xxxx",
+    [string]$clientSecret = "xxxx"
 )
 
 function Get-AccessToken {
